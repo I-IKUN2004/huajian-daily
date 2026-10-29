@@ -1,0 +1,5 @@
+import{prepareAIInput}from'./ai-input.mjs';
+export const PRIVATE_KINDS=['profile','cycle','reflection'];
+export const CONTENT_FIELDS=['title','content','rawText','name','subtitle','author','mood','location','date','occurredOn','targetDate','displayDate','year','month','day','annual','done','resolved','favorite','tags','photos','ingredients','preferredBy','spice','completedOn','event','feelingsMine','feelingsOther','nextAgreement','sourceText','groups','slot','unlockAt'];
+export function aiContextData(row){const fields=row.kind==='photo'?['title','tags','date','location']:CONTENT_FIELDS;const result={};for(const k of fields)if(row.data[k]!==undefined){let v=row.data[k];if(typeof v==='string')v=prepareAIInput(v).slice(0,1800);else v=JSON.parse(prepareAIInput(JSON.stringify(v)));result[k]=v}return result;}
+export function canShareAI(row,sensitive=false){return !row.locked&&!row.deletedAt&&!row.purging&&!row.data.restorePending&&!(row.kind==='letter'&&row.data.unlockAt&&Date.parse(row.data.unlockAt)>Date.now())&&(!PRIVATE_KINDS.includes(row.kind)||sensitive);}
